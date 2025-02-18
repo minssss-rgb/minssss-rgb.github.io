@@ -1,41 +1,120 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Get Access Token and copy</title>
+  <title>Access Token Extraction & Copying</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f7f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    .container {
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+    }
+
+    .button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      width: 100%;
+    }
+
+    .button:hover {
+      background-color: #45a049;
+    }
+
+    .alert {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .success {
+      color: #4CAF50;
+    }
+
+    .error {
+      color: #f44336;
+    }
+  </style>
 </head>
 <body>
-  <h2>Get Access Token</h2>
-  <p>
-    OAuth 인증 후 자동으로 Access Token을 클립보드에 복사하거나,<br>
-    아래 버튼을 클릭하여 수동으로 복사할 수 있습니다.
-  </p>
 
-  <!-- Access Token 복사 버튼 -->
-  <button onclick="copyAccessToken()">🔑 Copy Access Token</button>
+  <div class="container">
+    <h2>GitHub Access Token Extraction</h2>
+    <p>
+      After OAuth authentication, the access token is automatically copied to your clipboard.<br>
+      Alternatively, click the button below to manually copy it.
+    </p>
+
+    <!-- Access Token Copy Button -->
+    <button class="button" onclick="copyAccessToken()">🔑 Copy Access Token</button>
+
+    <div id="alertMessage" class="alert"></div>
+  </div>
 
   <script>
-    // URL에서 access_token 값 추출
+    // Extract the access_token value from the URL
     function getAccessTokenFromURL() {
       const urlParams = new URLSearchParams(window.location.hash.substring(1)); 
       return urlParams.get("access_token");
     }
 
-    // access_token 값을 클립보드에 복사하는 함수
+    // Copy the access_token value to the clipboard
     function copyAccessToken() {
       const accessToken = getAccessTokenFromURL();
+      const alertMessage = document.getElementById("alertMessage");
 
       if (accessToken) {
         navigator.clipboard.writeText(accessToken)
-          .then(() => alert("Successfully copied!✅"))
-          .catch(err => alert("Copy failed ❌: " + err));
+          .then(() => {
+            alertMessage.textContent = "Access Token copied successfully! ✅";
+            alertMessage.classList.add("success");
+            alertMessage.classList.remove("error");
+          })
+          .catch(err => {
+            alertMessage.textContent = "Failed to copy Access Token ❌: " + err;
+            alertMessage.classList.add("error");
+            alertMessage.classList.remove("success");
+          });
       } else {
-        alert("Can't find access token ❌");
+        alertMessage.textContent = "Access Token not found ❌";
+        alertMessage.classList.add("error");
+        alertMessage.classList.remove("success");
       }
     }
 
-    // 페이지 로드 시 자동 복사 시도
+    // Automatically attempt to copy the access token on page load
     window.onload = function() {
       copyAccessToken();
     };
